@@ -1,0 +1,25 @@
+services:
+  - type: web
+    name: mcq-backend
+    env: python
+    plan: starter  # You can upgrade to standard or pro based on your needs
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: GOOGLE_API_KEY
+        sync: false  # You'll need to set this manually in Render dashboard
+      - key: PYTHON_VERSION
+        value: "3.11"
+    disk:
+      name: mcq-storage
+      mountPath: /opt/render/project/src
+      sizeGB: 2  # Increased storage for video processing
+    scaling:
+      minInstances: 1
+      maxInstances: 3
+    healthCheckPath: /docs  # FastAPI auto-generates docs at /docs
+    
+# Optional: Add a build script if you need system dependencies
+buildScript: |
+  # Install system dependencies for ffmpeg
+  apt-get update && apt-get install -y ffmpeg
